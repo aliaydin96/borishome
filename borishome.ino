@@ -45,7 +45,7 @@ void setup() {
   pinMode(A3, INPUT); // dakika potu
   pinMode(A6, INPUT); // saat için kullanılan anahtar
   pinMode(A7, INPUT);  // dakika kullanilan anahtar
-  pinMode(13, OUTPUT);
+
   dht1.begin();
 //  dht2.begin();
   if (! RTC.isrunning()) {
@@ -73,7 +73,6 @@ void loop() {
     analogWrite(role, 1023);
     analogWrite(role1, 1023);
       if(uyanmaUyumaAnahtari > 900){
-         digitalWrite(13, HIGH);
           uyanmaSaati = map(analogRead(A2),0,1023,0,24);
           uyanmaDakika = map(analogRead(A3),0,1023,0,60);
           lcd.clear();
@@ -84,11 +83,8 @@ void loop() {
           lcd.print(":");
           lcd.print(uyanmaDakika);
           delay(100);
-          digitalWrite(13, LOW);
-
       }
       else if(uyanmaUyumaAnahtari < 200){
-          digitalWrite(13, HIGH);
           uyumaSaati = map(analogRead(A2),0,1023,23,-1);
           uyumaDakika = map(analogRead(A3),0,1023,0,60);
           lcd.clear();
@@ -99,8 +95,6 @@ void loop() {
           lcd.print(":");
           lcd.print(uyumaDakika);
           delay(100);
-          digitalWrite(13, LOW);
-
       }
       }
   else{
@@ -114,7 +108,6 @@ void loop() {
     
       optimumSicaklikAnahtari = analogRead(A1);
       if(optimumSicaklikAnahtari > 500){  //anahtarın açık olduğundan emin olmak için kullandım
-        digitalWrite(13, HIGH);
         optimumsicaklik = map(analogRead(A0), 0, 1023, 10, 60);  // map fonksiyonu değer aralığını istediğimiz aralığa getirir
         mode1 = 10;
         lcd.clear();
@@ -122,7 +115,6 @@ void loop() {
         lcd.print("Optimum Sicaklik");
         lcd.setCursor(7,1);
         lcd.print(optimumsicaklik);
-        digitalWrite(13, LOW);
 
       }
       else { 
