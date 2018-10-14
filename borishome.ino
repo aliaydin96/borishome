@@ -1,4 +1,4 @@
-int optimumsicaklik=0; /// ayarlanan sıcaklık
+int optimumsicaklik=33; /// ayarlanan sıcaklık
 
 #include "DHT.h"
 #define DHT1PIN 8     // what pin we're connected to
@@ -45,6 +45,7 @@ void setup() {
   pinMode(A3, INPUT); // dakika potu
   pinMode(A6, INPUT); // saat için kullanılan anahtar
   pinMode(A7, INPUT);  // dakika kullanilan anahtar
+  pinMode(13, OUTPUT);
   dht1.begin();
 //  dht2.begin();
   if (! RTC.isrunning()) {
@@ -55,6 +56,10 @@ void setup() {
 }
 
 void loop() {
+   float nem = dht1.readHumidity(); //semsörden alınan nem bilgisi
+   float sicaklik = dht1.readTemperature(); // sensörden alınan sıcaklık bilgisi
+
+  
   DateTime now = RTC.now();
   
   if ((now.hour() == uyanmaSaati) && (now.minute() == uyanmaDakika)) mode2 = 1;
@@ -64,9 +69,11 @@ void loop() {
   uyanmaUyumaAnahtari = analogRead(A7);
   
   if(saatAyarlamaAnahtari > 900){
+    
     analogWrite(role, 1023);
     analogWrite(role1, 1023);
       if(uyanmaUyumaAnahtari > 900){
+         digitalWrite(13, HIGH);
           uyanmaSaati = map(analogRead(A2),0,1023,0,24);
           uyanmaDakika = map(analogRead(A3),0,1023,0,60);
           lcd.clear();
@@ -76,8 +83,12 @@ void loop() {
           lcd.print(uyanmaSaati);
           lcd.print(":");
           lcd.print(uyanmaDakika);
+          delay(100);
+          digitalWrite(13, LOW);
+
       }
       else if(uyanmaUyumaAnahtari < 200){
+          digitalWrite(13, HIGH);
           uyumaSaati = map(analogRead(A2),0,1023,23,-1);
           uyumaDakika = map(analogRead(A3),0,1023,0,60);
           lcd.clear();
@@ -87,22 +98,23 @@ void loop() {
           lcd.print(uyumaSaati); 
           lcd.print(":");
           lcd.print(uyumaDakika);
+          delay(100);
+          digitalWrite(13, LOW);
+
       }
       }
   else{
-  
   if (mode2 == 1) 
   {
 
     ///////////////
       analogWrite(role1, 0);
-      float nem = dht1.readHumidity(); //semsörden alınan nem bilgisi
-      float sicaklik = dht1.readTemperature(); // sensörden alınan sıcaklık bilgisi
     //  float h2 = dht2.readHumidity();
     //  float t2 = dht2.readTemperature();
     
       optimumSicaklikAnahtari = analogRead(A1);
       if(optimumSicaklikAnahtari > 500){  //anahtarın açık olduğundan emin olmak için kullandım
+        digitalWrite(13, HIGH);
         optimumsicaklik = map(analogRead(A0), 0, 1023, 10, 60);  // map fonksiyonu değer aralığını istediğimiz aralığa getirir
         mode1 = 10;
         lcd.clear();
@@ -110,8 +122,11 @@ void loop() {
         lcd.print("Optimum Sicaklik");
         lcd.setCursor(7,1);
         lcd.print(optimumsicaklik);
+        digitalWrite(13, LOW);
+
       }
-      else mode1 = 0;
+      else { 
+        mode1 = 0;}
       if(mode1 == 0){
         lcd.clear();
         lcd.setCursor(2, 0);
@@ -183,9 +198,41 @@ void loop() {
   }
   
   else {
-    
     analogWrite(role, 1023);
     analogWrite(role1, 1023);
+      if(mode1 == 0){
+        lcd.clear();
+        lcd.setCursor(2, 0);
+        lcd.print("!!!!HEILL!!!");
+        lcd.setCursor(1,1);
+        lcd.print("!!!RALAZABA!!!");
+        mode1 = 1;
+        delay(1000);
+      }
+      if(mode1 == 1){
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Sicaklik: ");
+        lcd.print(sicaklik);
+        lcd.setCursor(0, 1);
+        lcd.print("Nem: ");
+        lcd.print(nem);
+        mode1 = 2;
+        delay(2000); 
+      }
+      if(mode1 == 2){
+        lcd.clear();
+        lcd.setCursor(5,0);
+        lcd.print("Saat ");
+        lcd.setCursor(5,1);
+        lcd.print(now.hour());
+        lcd.print(":");
+        lcd.print(now.minute());
+        delay(2000);
+        mode1 = 0;
+      }
+
+    
   }
   }
 }
