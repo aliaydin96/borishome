@@ -64,7 +64,7 @@ void loop() {
   
   if ((now.hour() == uyanmaSaati) && (now.minute() == uyanmaDakika)) mode2 = 1;
   if ((now.hour() == uyumaSaati) && (now.minute() == uyumaDakika)) mode2 = 0;
-
+  if ((now.hour() > uyumaSaati) || (now.hour() < uyanmaSaati)) mode2 = 0; 
   saatAyarlamaAnahtari = analogRead(A6);
   uyanmaUyumaAnahtari = analogRead(A7);
   
